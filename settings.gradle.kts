@@ -1,2 +1,2 @@
-rootProject.name = "kotlin-lokalise-client"
+rootProject.name = "lokalise-client"
 

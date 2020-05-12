@@ -1,10 +1,13 @@
 plugins {
     kotlin("jvm") version "1.3.61"
     id("com.jfrog.bintray") version "1.8.5"
+    `maven-publish`
 }
 
-group = "org.example"
-version = "1.0-SNAPSHOT"
+val versionName = "1.0.0"
+
+group = "com.hedvig"
+version = versionName
 
 repositories {
     mavenCentral()
@@ -13,23 +16,43 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
-    implementation("com.squareup.okhttp3:okhttp:4.3.1")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.11.0")
-    implementation("com.fasterxml.jackson.core:jackson-annotations:2.11.0")
+    api("com.squareup.okhttp3:okhttp:4.3.1")
+    api("com.fasterxml.jackson.core:jackson-databind:2.11.0")
+    api("com.fasterxml.jackson.core:jackson-annotations:2.11.0")
+    implementation("org.slf4j:slf4j-api:1.7.30")
 }
 
-tasks {
-    compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+fun MavenPom.addDependencies() = withXml {
+    asNode().appendNode("dependencies").let { depNode ->
+        configurations.compile.allDependencies.forEach {
+            depNode.appendNode("dependency").apply {
+                appendNode("groupId", it.group)
+                appendNode("artifactId", it.name)
+                appendNode("version", it.version)
+            }
+        }
     }
-    compileTestKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+}
+
+val sourcesJar by tasks.registering(Jar::class) {
+    classifier = "sources"
+    from(sourceSets.main.get().allSource)
+}
+
+publishing {
+    publications {
+        register("mavenJava", MavenPublication::class) {
+            from(components["java"])
+            artifact(sourcesJar.get())
+        }
     }
 }
 
 bintray {
     user = project.findProperty("bintrayUser").toString()
     key = project.findProperty("bintrayKey").toString()
+    publish = true
+    setPublications("mavenJava")
     pkg.apply {
         repo = "hedvig-java"
         name = "lokalise-client"
@@ -37,10 +60,10 @@ bintray {
         setLicenses("MIT")
         vcsUrl = "https://github.com/HedvigInsurance/LokaliseClient.git"
         version.apply {
-            name = "0.0.0"
+            name = versionName
             desc = "Test version"
-            released  = "Mon May 11 16:59:50 CEST 2020"
-            vcsTag = "0.0.0"
+            released  = "Mon May 12 16::50 CEST 2020"
+            vcsTag = versionName
         }
     }
 }

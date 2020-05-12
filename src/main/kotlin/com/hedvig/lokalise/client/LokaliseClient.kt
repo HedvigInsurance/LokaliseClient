@@ -62,12 +62,8 @@ class LokaliseClient(
         }.toMap()
     }.toMap()
 
-    fun getTranslation(key: String, locale: Locale) = (
-            keyToTranslationsMap[key] ?: error(
-                "Failed to find key: $key"
-            ))[locale] ?: error(
-        "[Key: ${keyToTranslationsMap[key]}] did have locale: $locale"
-    )
+    fun getTranslation(key: String, locale: Locale) =
+            keyToTranslationsMap[key]?.let { it[locale] }
 
     companion object {
         private val languageIsoRegex = Regex("[a-zA-Z][a-zA-Z]_[a-zA-Z][a-zA-Z]")
