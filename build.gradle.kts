@@ -61,8 +61,6 @@ bintray {
         vcsUrl = "https://github.com/HedvigInsurance/LokaliseClient.git"
         version.apply {
             name = versionName
-            desc = "Test version"
-            released  = "Mon May 12 16::50 CEST 2020"
             vcsTag = versionName
         }
     }
