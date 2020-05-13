@@ -26,6 +26,6 @@ object LocaleResolver {
         Locale("en", "no")
     )
 
-    private val DEFAULT_LOCALE = Locale("sv", "se")
+    val DEFAULT_LOCALE = Locale("sv", "se")
     private val loggger = LoggerFactory.getLogger(this::class.java)
 }
