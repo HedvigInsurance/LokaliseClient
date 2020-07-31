@@ -11,6 +11,9 @@ version = versionName
 
 repositories {
     mavenCentral()
+    maven {
+        setUrl("https://dl.bintray.com/brightinventions/maven")
+    }
 }
 
 dependencies {
@@ -20,6 +23,10 @@ dependencies {
     api("com.fasterxml.jackson.core:jackson-databind:2.11.0")
     api("com.fasterxml.jackson.core:jackson-annotations:2.11.0")
     implementation("org.slf4j:slf4j-api:1.7.30")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.1.0")
+    testImplementation("io.mockk:mockk:1.10.0")
+    testImplementation("pl.miensol.shouldko:hamcrest:0.2.2")
 }
 
 fun MavenPom.addDependencies() = withXml {
