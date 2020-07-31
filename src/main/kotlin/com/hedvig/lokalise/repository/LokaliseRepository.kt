@@ -1,63 +1,69 @@
 package com.hedvig.lokalise.repository
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.hedvig.lokalise.client.model.LokaliseResponse
-import okhttp3.OkHttpClient
-import okhttp3.Request
+import com.hedvig.lokalise.internal.LokaliseClient
+import com.hedvig.util.logger
 import java.util.Locale
 
-class LokaliseRepository(
+/**
+ * Provides access to translations from Lokalise.
+ *
+ * Note: This class is temporarily `open` in order to not break backwards compatibility.
+ * Do not rely on this behaviour, as it will be removed.
+ */
+open class LokaliseRepository(
     private val projectId: String,
     private val apiToken: String,
-    private val pageLimit: Int
+    private val pageLimit: Int = 100,
+    private val client: LokaliseClient = LokaliseClient(
+        projectId,
+        apiToken,
+        pageLimit
+    )
 ) {
-    private val client = OkHttpClient()
-    private val objectMapper = ObjectMapper()
-    private val requestBuilder = Request.Builder()
+    private val logger by logger()
+    private val keyToTranslationsMap: Map<String, Map<Locale, String>>
 
-    fun fetchKeys(page: Int): Pair<Map<String, Map<Locale, String>>, Int> {
-        val request: Request = requestBuilder
-            .url(
-                createLokaliseRequestUrl(
-                    projectId,
-                    pageLimit,
-                    page
-                )
-            )
-            .addHeader(API_TOKEN_HEADER, apiToken)
-            .build()
-
-        val response = client.newCall(request).execute()
-        val responseBody = response.body?.string()
-
-        return Pair(
-            parseLokaliseResponse(
-                objectMapper.readValue(
-                    responseBody,
-                    LokaliseResponse::class.java
-                )
-            ), response.header(PAGE_COUNT_HEADER)!!.toInt()
-        )
+    init {
+        keyToTranslationsMap = fetchPaginated(1, mutableMapOf())
     }
 
-    private fun parseLokaliseResponse(lokaliseResponse: LokaliseResponse) = lokaliseResponse.keys.map { key ->
-        key.keyName.other to key.translations.map { translation ->
-            if (translation.languageIso.matches(languageIsoRegex)) {
-                val split = translation.languageIso.split(split)
-                Locale(split[0], split[1]) to translation.translation
-            } else {
-                Locale(translation.languageIso) to translation.translation
+    private fun fetchPaginated(
+        page: Int,
+        mutableMap: MutableMap<String, Map<Locale, String>>
+    ): Map<String, Map<Locale, String>> {
+        val (response, totalNumberOfPages) = client.fetchKeys(page)
+        mutableMap.putAll(response)
+
+        val nextPage = page.plus(1)
+
+        return if (nextPage > totalNumberOfPages) {
+            mutableMap.toMap()
+        } else {
+            fetchPaginated(nextPage, mutableMap)
+        }
+    }
+
+    fun getTranslation(key: String, locale: Locale, replacements: Map<String, String> = emptyMap()): String? {
+        val translation = keyToTranslationsMap[key]?.let { it[locale] } ?: return null
+
+        return lokalisePlaceholderSyntaxMatcher
+            .findAll(translation)
+            .fold(translation) { acc, curr ->
+                val replacementName = curr.groups[1]?.value
+                if (replacementName == null) {
+                    logger.warn("Unable to find replacement name in key: $key with translation: $translation")
+                    return acc
+                }
+                val replacement = replacements[replacementName]
+                if (replacement == null) {
+                    logger.warn("Requested replacement: $replacementName not found in key: $key with translation: $translation")
+                    return acc
+                }
+                return lokalisePlaceholderSyntaxMatcher.replaceFirst(acc, replacement)
             }
-        }.toMap()
-    }.toMap()
+    }
 
     companion object {
-        private val languageIsoRegex = Regex("[a-zA-Z][a-zA-Z]_[a-zA-Z][a-zA-Z]")
-        private val split = Regex("_")
-        private const val PAGE_COUNT_HEADER = "X-Pagination-Page-Count"
-        private const val API_TOKEN_HEADER = "X-Api-Token"
-
-        private fun createLokaliseRequestUrl(projectId: String, limit: Int, page: Int): String =
-            "https://api.lokalise.com/api2/projects/${projectId}/keys?include_translations=1&limit=$limit&page=$page"
+        private val lokalisePlaceholderSyntaxMatcher = Regex("\\[\\%\\d+\\\$[sif]\\:(.+?)\\]")
     }
 }

@@ -1,5 +1,6 @@
 package com.hedvig.lokalise.client
 
+import com.hedvig.lokalise.internal.LokaliseClient
 import com.hedvig.lokalise.repository.LokaliseRepository
 import io.mockk.every
 import io.mockk.mockk
@@ -7,11 +8,11 @@ import org.junit.jupiter.api.Test
 import pl.miensol.shouldko.shouldEqual
 import java.util.Locale
 
-internal class LokaliseClientTest {
+internal class LokaliseRepositoryTest {
     @Test
     fun `should handle placeholders correctly`() {
-        val repo = mockk<LokaliseRepository>()
-        every { repo.fetchKeys(any()) } returns Pair(
+        val client = mockk<LokaliseClient>()
+        every { client.fetchKeys(any()) } returns Pair(
             mapOf(
                 "TEST_KEY" to mapOf(
                     Locale.forLanguageTag(
@@ -21,9 +22,10 @@ internal class LokaliseClientTest {
             ), 1
         )
 
-        val client = LokaliseClient("", "", lokaliseRepository = repo)
+        val repo =
+            LokaliseRepository("", "", client = client)
 
-        client
+        repo
             .getTranslation("TEST_KEY", Locale.forLanguageTag("sv_SE"), mapOf("REFERRAL_VALUE" to "10"))
             .shouldEqual("Som tack får både du och dina vänner 10 kr lägre månadskostnad. Fortsätt bjuda in vänner för att sänka ditt pris ännu mer!")
     }
