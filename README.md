@@ -29,7 +29,7 @@ class LocalizationService(
     private val apiToken: String
 ) {
 
-    val client = LokaliseClient(
+    val client = LokaliseRepository(
         projectId,
         apiToken
     )
@@ -39,7 +39,7 @@ class LocalizationService(
 }
 ```
 
-Inject `LocalizationService` and use `getTranslation(key, locale)` where ever you need a translated string.
+Inject `LocalizationService` and use `LokaliseRepository.getTranslation(key, locale)` where ever you need a translated string.
 
 ##### Resolve `Locale`
 Use `LocaleResolver.resolveLocale(acceptLanguageString)` to resolve a Locale from a [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language) header
