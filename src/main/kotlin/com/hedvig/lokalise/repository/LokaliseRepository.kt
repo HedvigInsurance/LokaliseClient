@@ -1,16 +1,13 @@
 package com.hedvig.lokalise.repository
 
-import com.hedvig.lokalise.internal.LokaliseClient
+import com.hedvig.lokalise.client.LokaliseClient
 import com.hedvig.util.logger
 import java.util.Locale
 
 /**
  * Provides access to translations from Lokalise.
- *
- * Note: This class is temporarily `open` in order to not break backwards compatibility.
- * Do not rely on this behaviour, as it will be removed.
  */
-open class LokaliseRepository(
+class LokaliseRepository(
     private val projectId: String,
     private val apiToken: String,
     private val pageLimit: Int = 100,
@@ -64,6 +61,6 @@ open class LokaliseRepository(
     }
 
     companion object {
-        private val lokalisePlaceholderSyntaxMatcher = Regex("\\[\\%\\d+\\\$[sif]\\:(.+?)\\]")
+        private val lokalisePlaceholderSyntaxMatcher = Regex("\\[\\%\\d+\\\$[sif]\\:(.+)\\]")
     }
 }
