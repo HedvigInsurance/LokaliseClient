@@ -15,8 +15,11 @@ internal class LokaliseRepositoryTest {
             mapOf(
                 "TEST_KEY" to mapOf(
                     Locale.forLanguageTag(
-                        "sv_SE"
-                    ) to "Som tack får både du och dina vänner [%1\$i:REFERRAL_VALUE] kr lägre månadskostnad. Fortsätt bjuda in vänner för att sänka ditt pris ännu mer!"
+                        "sv-SE"
+                    ) to "Som tack får både du och dina vänner [%1\$i:REFERRAL_VALUE] kr lägre månadskostnad. Fortsätt bjuda in vänner för att sänka ditt pris ännu mer!",
+                    Locale.forLanguageTag(
+                        "nb-NO"
+                    ) to "Som takk får både du og vennene dine [%1\$i:REFERRAL_VALUE] kr lavere månedskostnad. Fortsett å invitere venner for å senke prisen din enda mer!"
                 )
             ), 1
         )
@@ -25,7 +28,7 @@ internal class LokaliseRepositoryTest {
             LokaliseRepository("", "", client = client)
 
         repo
-            .getTranslation("TEST_KEY", Locale.forLanguageTag("sv_SE"), mapOf("REFERRAL_VALUE" to "10"))
+            .getTranslation("TEST_KEY", Locale.forLanguageTag("sv-SE"), mapOf("REFERRAL_VALUE" to "10"))
             .shouldEqual("Som tack får både du och dina vänner 10 kr lägre månadskostnad. Fortsätt bjuda in vänner för att sänka ditt pris ännu mer!")
     }
 
@@ -36,7 +39,10 @@ internal class LokaliseRepositoryTest {
             mapOf(
                 "TEST_KEY" to mapOf(
                     Locale.forLanguageTag(
-                        "nb_NO"
+                        "sv-SE"
+                    ) to "Som tack får både du och dina vänner [%1\$i:REFERRAL_VALUE] kr lägre månadskostnad. Fortsätt bjuda in vänner för att sänka ditt pris ännu mer!",
+                    Locale.forLanguageTag(
+                        "nb-NO"
                     ) to "Som takk får både du og vennene dine [%1\$i:REFERRAL_VALUE] kr lavere månedskostnad. Fortsett å invitere venner for å senke prisen din enda mer!"
                 )
             ), 1
@@ -46,7 +52,7 @@ internal class LokaliseRepositoryTest {
             LokaliseRepository("", "", client = client)
 
         repo
-            .getTranslation("TEST_KEY", Locale.forLanguageTag("sv_SE"), mapOf("REFERRAL_VALUE" to "10"))
+            .getTranslation("TEST_KEY", Locale.forLanguageTag("nb-NO"), mapOf("REFERRAL_VALUE" to "10"))
             .shouldEqual("Som takk får både du og vennene dine 10 kr lavere månedskostnad. Fortsett å invitere venner for å senke prisen din enda mer!")
     }
 }
