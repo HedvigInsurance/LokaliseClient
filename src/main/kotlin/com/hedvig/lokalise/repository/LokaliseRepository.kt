@@ -56,11 +56,11 @@ class LokaliseRepository(
                     logger.warn("Requested replacement: $replacementName not found in key: $key with translation: $translation")
                     return acc
                 }
-                return lokalisePlaceholderSyntaxMatcher.replaceFirst(acc, replacement)
+                return@fold lokalisePlaceholderSyntaxMatcher.replaceFirst(acc, replacement)
             }
     }
 
     companion object {
-        private val lokalisePlaceholderSyntaxMatcher = Regex("\\[\\%\\d+\\\$[sif]\\:(.+)\\]")
+        private val lokalisePlaceholderSyntaxMatcher = Regex("\\[\\%\\d+\\\$[sif]\\:(\\w+)\\]")
     }
 }
