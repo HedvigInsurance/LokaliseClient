@@ -4,7 +4,7 @@ plugins {
     `maven-publish`
 }
 
-val versionName = "1.0.1"
+val versionName = "2.0.0"
 
 group = "com.hedvig"
 version = versionName
