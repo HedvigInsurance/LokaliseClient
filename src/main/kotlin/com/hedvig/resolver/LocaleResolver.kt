@@ -5,9 +5,15 @@ import java.util.*
 
 object LocaleResolver {
 
-    fun resolveLocale(acceptLanguage: String?): Locale {
+    fun resolveLocale(acceptLanguage: String?): Locale =
+        resolveLocale(acceptLanguage, DEFAULT_LOCALE)!!
+
+    fun resolveNullableLocale(acceptLanguage: String?): Locale? =
+        resolveLocale(acceptLanguage, null)
+
+    private fun resolveLocale(acceptLanguage: String?, defaultLocale: Locale?): Locale? {
         if (acceptLanguage.isNullOrBlank()) {
-            return DEFAULT_LOCALE
+            return defaultLocale
         }
 
         return try {
@@ -15,7 +21,7 @@ object LocaleResolver {
             Locale.lookup(list, LOCALES) ?: DEFAULT_LOCALE
         } catch (e: IllegalArgumentException) {
             loggger.error("IllegalArgumentException when parsing acceptLanguage: '$acceptLanguage' message: ${e.message}")
-            DEFAULT_LOCALE
+            defaultLocale
         }
     }
 
