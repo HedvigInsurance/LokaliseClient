@@ -11,9 +11,6 @@ version = versionName
 
 repositories {
     mavenCentral()
-    maven {
-        setUrl("https://dl.bintray.com/brightinventions/maven")
-    }
 }
 
 dependencies {
@@ -26,7 +23,7 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.1.0")
     testImplementation("io.mockk:mockk:1.10.0")
-    testImplementation("pl.miensol.shouldko:hamcrest:0.2.2")
+    testImplementation("org.assertj:assertj-core:3.19.0")
 }
 
 fun MavenPom.addDependencies() = withXml {
@@ -46,29 +43,24 @@ val sourcesJar by tasks.registering(Jar::class) {
     from(sourceSets.main.get().allSource)
 }
 
-publishing {
-    publications {
-        register("mavenJava", MavenPublication::class) {
-            from(components["java"])
-            artifact(sourcesJar.get())
-        }
-    }
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
 
-bintray {
-    user = project.findProperty("bintrayUser").toString()
-    key = project.findProperty("bintrayKey").toString()
-    publish = true
-    setPublications("mavenJava")
-    pkg.apply {
-        repo = "hedvig-java"
-        name = "lokalise-client"
-        userOrg = "hedvig"
-        setLicenses("MIT")
-        vcsUrl = "https://github.com/HedvigInsurance/LokaliseClient.git"
-        version.apply {
-            name = versionName
-            vcsTag = versionName
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/hedviginsurance/libs")
+            credentials {
+                username = project.findProperty("GITHUB_USER") as String? ?: System.getenv("GITHUB_USER")
+                password = project.findProperty("GITHUB_TOKEN") as String? ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+    publications {
+        register("gpr", MavenPublication::class) {
+            from(components["java"])
         }
     }
 }

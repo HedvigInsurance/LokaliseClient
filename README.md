@@ -48,4 +48,14 @@ Use `LocaleResolver.resolveLocale(acceptLanguageString)` to resolve a Locale fro
 * Enable reload with webhooks
 
 #### Development
-Upload to bintray, run: `./gradlew clean build bintrayUpload -PbintrayUser="[bintray-username]" -PbintrayKey="[bintray-api-token]"`
+Upload to GitHub Packages, run: `./gradlew clean deploy`
+
+Note:
+The GitHub token have to be in place to be able to deploy the lib. To achieve this in a local development environment:
+
+1. Create a personal GitHub development token with `write:packages` access.
+2. Create a new file `gradle.properties` in the project root (or globally in `~/.gradle` folder) and insert
+   the token generated in step (1) like this:
+
+GITHUB_USER=<github user>
+GITHUB_TOKEN=<github token>
