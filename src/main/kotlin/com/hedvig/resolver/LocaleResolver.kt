@@ -6,7 +6,7 @@ import java.util.*
 object LocaleResolver {
 
     fun resolveLocale(acceptLanguage: String?): Locale =
-        resolveLocale(acceptLanguage, DEFAULT_LOCALE)!!
+        resolveLocale(acceptLanguage, FALLBACK_LOCALE)!!
 
     fun resolveNullableLocale(acceptLanguage: String?): Locale? =
         resolveLocale(acceptLanguage, null)
@@ -18,7 +18,7 @@ object LocaleResolver {
 
         return try {
             val list = Locale.LanguageRange.parse(acceptLanguage)
-            Locale.lookup(list, LOCALES) ?: DEFAULT_LOCALE
+            Locale.lookup(list, LOCALES) ?: FALLBACK_LOCALE
         } catch (e: IllegalArgumentException) {
             loggger.error("IllegalArgumentException when parsing acceptLanguage: '$acceptLanguage' message: ${e.message}")
             defaultLocale
@@ -29,9 +29,11 @@ object LocaleResolver {
         Locale("en", "se"),
         Locale("sv", "se"),
         Locale("nb", "no"),
-        Locale("en", "no")
+        Locale("en", "no"),
+        Locale("da", "dk"),
+        Locale("en", "dk")
     )
 
-    val DEFAULT_LOCALE = Locale("sv", "se")
+    val FALLBACK_LOCALE = Locale("sv", "se")
     private val loggger = LoggerFactory.getLogger(this::class.java)
 }

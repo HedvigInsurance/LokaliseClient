@@ -16,10 +16,13 @@ internal class LokaliseRepositoryTest {
                 "TEST_KEY" to mapOf(
                     Locale.forLanguageTag(
                         "sv-SE"
-                    ) to "Som tack får både du och dina vänner [%1\$i:REFERRAL_VALUE] kr lägre månadskostnad. Fortsätt bjuda in vänner för att sänka ditt pris ännu mer!",
+                    ) to "Swedish Placeholder [%1\$i:REFERRAL_VALUE] kr",
                     Locale.forLanguageTag(
                         "nb-NO"
-                    ) to "Som takk får både du og vennene dine [%1\$i:REFERRAL_VALUE] kr lavere månedskostnad. Fortsett å invitere venner for å senke prisen din enda mer!"
+                    ) to "Norwegian Placeholder [%1\$i:REFERRAL_VALUE] kr",
+                    Locale.forLanguageTag(
+                        "da-DK"
+                    ) to "Danish Placeholder [%1\$i:REFERRAL_VALUE] kr"
                 )
             ), 1
         )
@@ -30,7 +33,10 @@ internal class LokaliseRepositoryTest {
         val translation = repo
             .getTranslation("TEST_KEY", Locale.forLanguageTag("sv-SE"), mapOf("REFERRAL_VALUE" to "10"))
 
-        assertEquals(translation, "Som tack får både du och dina vänner 10 kr lägre månadskostnad. Fortsätt bjuda in vänner för att sänka ditt pris ännu mer!")
+        assertEquals(
+            translation,
+            "Swedish Placeholder 10 kr"
+        )
     }
 
     @Test
@@ -41,10 +47,13 @@ internal class LokaliseRepositoryTest {
                 "TEST_KEY" to mapOf(
                     Locale.forLanguageTag(
                         "sv-SE"
-                    ) to "Som tack får både du och dina vänner [%1\$i:REFERRAL_VALUE] kr lägre månadskostnad. Fortsätt bjuda in vänner för att sänka ditt pris ännu mer!",
+                    ) to "Swedish Placeholder [%1\$i:REFERRAL_VALUE] kr",
                     Locale.forLanguageTag(
                         "nb-NO"
-                    ) to "Som takk får både du og vennene dine [%1\$i:REFERRAL_VALUE] kr lavere månedskostnad. Fortsett å invitere venner for å senke prisen din enda mer!"
+                    ) to "Norwegian Placeholder [%1\$i:REFERRAL_VALUE] kr",
+                    Locale.forLanguageTag(
+                        "da-DK"
+                    ) to "Danish Placeholder [%1\$i:REFERRAL_VALUE] kr"
                 )
             ), 1
         )
@@ -55,7 +64,41 @@ internal class LokaliseRepositoryTest {
         val translation = repo
             .getTranslation("TEST_KEY", Locale.forLanguageTag("nb-NO"), mapOf("REFERRAL_VALUE" to "10"))
 
-        assertEquals(translation, "Som takk får både du og vennene dine 10 kr lavere månedskostnad. Fortsett å invitere venner for å senke prisen din enda mer!")
+        assertEquals(
+            translation,
+            "Norwegian Placeholder 10 kr"
+        )
+    }
+
+    @Test
+    fun `should handle placeholders correctly with danish locale`() {
+        val client = mockk<LokaliseClient>()
+        every { client.fetchKeys(any()) } returns Pair(
+            mapOf(
+                "TEST_KEY" to mapOf(
+                    Locale.forLanguageTag(
+                        "sv-SE"
+                    ) to "Swedish Placeholder [%1\$i:REFERRAL_VALUE] kr",
+                    Locale.forLanguageTag(
+                        "nb-NO"
+                    ) to "Norwegian Placeholder [%1\$i:REFERRAL_VALUE] kr",
+                    Locale.forLanguageTag(
+                        "da-DK"
+                    ) to "Danish Placeholder [%1\$i:REFERRAL_VALUE] kr"
+                )
+            ), 1
+        )
+
+        val repo =
+            LokaliseRepository("", "", client = client)
+
+        val translation = repo
+            .getTranslation("TEST_KEY", Locale.forLanguageTag("da-DK"), mapOf("REFERRAL_VALUE" to "10"))
+
+        assertEquals(
+            translation,
+            "Danish Placeholder 10 kr"
+        )
     }
 
     @Test
@@ -66,7 +109,7 @@ internal class LokaliseRepositoryTest {
                 "TEST_KEY" to mapOf(
                     Locale.forLanguageTag(
                         "nb-NO"
-                    ) to "Når noen får Hedvig via linken din eller med koden din, får dere begge en [%1\$s:discount]-rabatt per måned. Helt ned til [%2\$s:minimumValue]/mo."
+                    ) to "Discount: [%1\$s:discount]-rabatt Minumum: [%2\$s:minimumValue]/mo."
                 )
             ), 1
         )
@@ -81,6 +124,9 @@ internal class LokaliseRepositoryTest {
                 mapOf("discount" to "10 kr", "minimumValue" to "0 kr")
             )
 
-        assertEquals(translation, "Når noen får Hedvig via linken din eller med koden din, får dere begge en 10 kr-rabatt per måned. Helt ned til 0 kr/mo.")
+        assertEquals(
+            translation,
+            "Discount: 10 kr-rabatt Minumum: 0 kr/mo."
+        )
     }
 }
