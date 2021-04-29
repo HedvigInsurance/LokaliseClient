@@ -48,7 +48,9 @@ Use `LocaleResolver.resolveLocale(acceptLanguageString)` to resolve a Locale fro
 * Enable reload with webhooks
 
 #### Development
-Upload to GitHub Packages, run: `./gradlew clean deploy`
+Upload to GitHub Packages:
+1. Update `versionName` in `build.gradle.kts` to an appropriate version
+2. run: `./gradlew clean publish`
 
 Note:
 The GitHub token have to be in place to be able to deploy the lib. To achieve this in a local development environment:
